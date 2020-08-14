@@ -2,6 +2,13 @@
 const { login } = require('../controller/user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
+// 设置 cookie 过期时间
+const setCookieExpires = () => {
+    const date = new Date()
+    date.setTime(date.getTime() + (24 * 60 * 60 * 1000))
+    return date.toGMTString()
+}
+
 const handlerUserRouter = (req, res) => {
     let method = req.method
     // 登陆
@@ -13,7 +20,7 @@ const handlerUserRouter = (req, res) => {
             if (row.username) {
                 // 设置cookie
                 // httpOnly 限制前端修改 cookie
-                res.setHeader('Set-cookie', `username=${ row.username }; path=/; httpOnly`)
+                res.setHeader('Set-cookie', `username=${ row.username }; path=/; httpOnly; expires=${ setCookieExpires() }`)
                 return new SuccessModel()
             }
             return new ErrorModel('登陆失败')
