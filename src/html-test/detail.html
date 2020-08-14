@@ -44,6 +44,10 @@
         function get(url) {
             return $.get(url)
         }
+        function unescapeHTML (title) {
+            title = "" + title;
+            return title.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+        }
 
         // 显示格式化的时间
         function getFormatDate(dt) {
@@ -80,7 +84,7 @@
 
             // 显示数据
             const data = res.data[0] || {}
-            $title.text(data.title)
+            $title.text(unescapeHTML(data.title))
             $content.text(data.content)
             $infoContainer.append($(`
                 <span>
