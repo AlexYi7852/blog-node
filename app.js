@@ -1,6 +1,7 @@
 
 const redis = require('./src/database/redis')
 const querystring = require('querystring')
+const { access } = require('./src/utils/logs')
 const handlerBlogRouter = require('./src/router/blog')
 const handlerUserRouter = require('./src/router/user')
 
@@ -35,11 +36,13 @@ const postDataHandler = req => {
 }
 
 const serverHandler = (req, res) => {
+    // 记录 access_log
+    const { method, url, headers } = { ...req }
+    access(`${ method } -- ${ url } -- ${ headers['user-agent'] } -- ${ Date.now() }`)
     // 设置返回格式
     res.setHeader('Content-type', 'application/json')
 
     // 获取path
-    let url = req.url
     req.path = url.split('?')[0]
 
     // 解析query
@@ -47,7 +50,7 @@ const serverHandler = (req, res) => {
 
     // 解析cookie
     req.cookie = {}
-    const cookie = req.headers.cookie || '' // k1=v1;k2=v2;k3=v3
+    const cookie = headers.cookie || '' // k1=v1;k2=v2;k3=v3
     cookie.split(';').forEach(item => {
         if (!item) return
         const obj = item.split('=')

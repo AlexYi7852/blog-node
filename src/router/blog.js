@@ -37,7 +37,6 @@ const handlerBlogRouter = (req, res) => {
             }
             let result = getList(author, keyword)
             return result.then(list => {
-                console.log(list, 'list')
                 return new SuccessModel(list)
             })
         }
