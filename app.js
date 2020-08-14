@@ -76,7 +76,6 @@ const serverHandler = (req, res) => {
         } else {
             req.session = sessionData
         }
-        console.log(req.session)
         // 处理post data
         return postDataHandler(req)
     })

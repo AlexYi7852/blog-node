@@ -1,14 +1,15 @@
 const { exec } = require('../database/mysql')
 
 const getList = (author, keyword) => {
-    let sql = `select * from blogs where 1=1`
+    let sql = `select * from blogs where 1=1 `
     if (author) {
-        sql += `and author=${ author }`
+        sql += `and author='${ author }' `
     }
     if (keyword) {
-        sql += `and title like '%${ keyword }%'`
+        sql += `and title like '%${ keyword }%' `
     }
-    // sql += `order by createtime desc`
+    sql += `order by createtime desc`
+    console.log(sql, 'sql')
     // 返回 promise
     return exec(sql)
 }

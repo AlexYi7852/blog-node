@@ -6,7 +6,7 @@ const { SuccessModel, ErrorModel } = require('../model/resModel')
 const handlerUserRouter = (req, res) => {
     let method = req.method
     // 登陆
-    if (method === 'POSR' && req.path === '/api/user/login') {
+    if (method === 'POST' && req.path === '/api/user/login') {
         const { username, password } = req.body
         const result = login(username, password)
         return result.then(row => {
@@ -16,7 +16,6 @@ const handlerUserRouter = (req, res) => {
                 req.session.realname = row.realname
                 // 同步到 redis
                 set(req.sessionId, req.session)
-                console.log(req.session, 'session')
                 return new SuccessModel()
             }
             return new ErrorModel('登陆失败')

@@ -10,12 +10,10 @@ const {
 
 // 登陆验证
 const loginValid = req => {
-    if (req.session.username) {
-        return Promise.resolve(new SuccessModel(
-            { session: req.session }
-        ))
+    if (!req.session.username) {
+        return Promise.resolve(new ErrorModel('尚未登陆'))
     }
-    return Promise.resolve(new ErrorModel('尚未登陆'))
+    
 }
 
 const handlerBlogRouter = (req, res) => {
@@ -26,9 +24,20 @@ const handlerBlogRouter = (req, res) => {
         // 获取博客列表
         if (req.path === '/api/blog/list') {
             let author = req.query.author || ''
-            let kewword = req.query.kewword || ''
-            let result = getList(author, kewword)
+            let keyword = req.query.keyword || ''
+            if (req.query.isadmin) {
+                // 管理员界面
+                const validResult = loginValid(req)
+                if (validResult) {
+                    // 未登录
+                    return validResult
+                }
+                // 强制查询自己的博客
+                author = req.session.username
+            }
+            let result = getList(author, keyword)
             return result.then(list => {
+                console.log(list, 'list')
                 return new SuccessModel(list)
             })
         }
@@ -46,7 +55,7 @@ const handlerBlogRouter = (req, res) => {
             const validResult = loginValid(req)
             if (validResult) {
                 // 未登录
-                return loginValid
+                return validResult
             }
             req.body.author = req.session.username
             let result = newBlog(req.body)
@@ -62,7 +71,7 @@ const handlerBlogRouter = (req, res) => {
             const validResult = loginValid(req)
             if (validResult) {
                 // 未登录
-                return loginValid
+                return validResult
             }
             const result = updateBlog(blogId, req.body)
             return result.then(row => {
@@ -77,7 +86,7 @@ const handlerBlogRouter = (req, res) => {
             const validResult = loginValid(req)
             if (validResult) {
                 // 未登录
-                return loginValid
+                return validResult
             }
             const author = req.session.username
             const result = deleteBlog(blogId, author)
