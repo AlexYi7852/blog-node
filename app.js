@@ -3,6 +3,16 @@ const querystring = require('querystring')
 const handlerBlogRouter = require('./src/router/blog')
 const handlerUserRouter = require('./src/router/user')
 
+// session 数据
+const SESSION_DATA = {}
+
+// 设置 cookie 过期时间
+const setCookieExpires = () => {
+    const date = new Date()
+    date.setTime(date.getTime() + (24 * 60 * 60 * 1000))
+    return date.toGMTString()
+}
+
 const postDataHandler = req => {
     return new Promise((reslove, reject) => {
         if (req.method !== 'POST' || req.headers['content-type'] !== 'application/json') {
@@ -42,9 +52,22 @@ const serverHandler = (req, res) => {
         const obj = item.split('=')
         const key = obj[0].trim()
         const val = obj[1].trim()
-        console.log(key, val)
         req.cookie[key] = val
     });
+
+    // 解析 session
+    let isSetCookie = false // 判断是否需要设置cookie
+    let userId = req.cookie.userid
+    if (userId) {
+        if (!SESSION_DATA[userId]) {
+            SESSION_DATA[userId] = {}
+        }
+    } else {
+        isSetCookie = true
+        userId = `${ Date.now() }_${ Math.random() }`
+        SESSION_DATA[userId] = {}
+    }
+    req.session = SESSION_DATA[userId]
 
     // 处理post data
     postDataHandler(req).then(postData => {
@@ -58,6 +81,9 @@ const serverHandler = (req, res) => {
         const blogResult = handlerBlogRouter(req, res)
         if (blogResult) {
             blogResult.then(blogData => {
+                if (isSetCookie) {
+                    res.setHeader('Set-cookie', `userid=${ userId }; path=/; httpOnly; expires=${ setCookieExpires() }`)
+                }
                 res.end(JSON.stringify(blogData))
             })
             return
@@ -67,6 +93,11 @@ const serverHandler = (req, res) => {
         const userResult = handlerUserRouter(req, res)
         if (userResult) {
             userResult.then(userData => {
+                if (isSetCookie) {
+                    // 设置cookie
+                    // httpOnly 限制前端修改 cookie
+                    res.setHeader('Set-cookie', `userid=${ userId }; path=/; httpOnly; expires=${ setCookieExpires() }`)
+                }
                 res.end(JSON.stringify(userData))
             })
             return
