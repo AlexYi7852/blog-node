@@ -8,6 +8,16 @@ const {
     deleteBlog
 } = require('../controller/blog')
 
+// 登陆验证
+const loginValid = req => {
+    if (req.session.username) {
+        return Promise.resolve(new SuccessModel(
+            { session: req.session }
+        ))
+    }
+    return Promise.resolve(new ErrorModel('尚未登陆'))
+}
+
 const handlerBlogRouter = (req, res) => {
     let method = req.method
     let blogId = req.query.id || ''
@@ -33,6 +43,12 @@ const handlerBlogRouter = (req, res) => {
     if (method === 'POST') {
         // 新增博客
         if (req.path === '/api/blog/new') {
+            const validResult = loginValid(req)
+            if (validResult) {
+                // 未登录
+                return loginValid
+            }
+            req.body.author = req.session.username
             let result = newBlog(req.body)
             return result.then(row => {
                 if (row.insertId) {
@@ -43,6 +59,11 @@ const handlerBlogRouter = (req, res) => {
         }
         // 更新博客
         if (req.path === '/api/blog/update') {
+            const validResult = loginValid(req)
+            if (validResult) {
+                // 未登录
+                return loginValid
+            }
             const result = updateBlog(blogId, req.body)
             return result.then(row => {
                 if (row.affectedRows) {
@@ -53,7 +74,12 @@ const handlerBlogRouter = (req, res) => {
         }
         // 删除博客
         if (req.path === '/api/blog/del') {
-            const author = 'Alex Yi'
+            const validResult = loginValid(req)
+            if (validResult) {
+                // 未登录
+                return loginValid
+            }
+            const author = req.session.username
             const result = deleteBlog(blogId, author)
             return result.then(row => {
                 if (row.affectedRows) {
