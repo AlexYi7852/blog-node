@@ -13,7 +13,6 @@ const getList = (author, keyword) => {
         sql += `and title like '%${ xss(escape(keyword)) }%' `
     }
     sql += `order by createtime desc`
-    console.log(sql)
     // 返回 promise
     return exec(sql)
 }
@@ -32,7 +31,6 @@ const newBlog = (blogData = {}) => {
     const content = xss(escape(blogData.content))
     const createTime = Date.now()
     let sql = `insert into blogs (title, content, createtime, author) values (${ title }, ${ content }, ${ createTime }, ${ author })`
-    console.log(sql)
     return exec(sql)
 }
 

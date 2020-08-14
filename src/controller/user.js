@@ -8,7 +8,6 @@ const login = (username, password) => {
     // 生成加密密码
     password = xss(escape(getPassword(password)))
     const sql = `select username, realname from users where username=${ username } and password=${ password }`
-    console.log(sql)
     return exec(sql).then(res => {
         return res[0] || {}
     })
