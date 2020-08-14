@@ -40,11 +40,11 @@ const serverHandler = (req, res) => {
     cookie.split(';').forEach(item => {
         if (!item) return
         const obj = item.split('=')
-        const key = obj[0]
-        const val = obj[1]
+        const key = obj[0].trim()
+        const val = obj[1].trim()
+        console.log(key, val)
         req.cookie[key] = val
     });
-    console.log(req.cookie, 'cookie')
 
     // 处理post data
     postDataHandler(req).then(postData => {
@@ -63,7 +63,7 @@ const serverHandler = (req, res) => {
             return
         }
         // 处理登陆路由
-        let userData = handlerUserRouter(req, res)
+        // let userData = handlerUserRouter(req, res)
         const userResult = handlerUserRouter(req, res)
         if (userResult) {
             userResult.then(userData => {

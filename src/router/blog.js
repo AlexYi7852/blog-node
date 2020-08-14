@@ -37,9 +37,8 @@ const handlerBlogRouter = (req, res) => {
             return result.then(row => {
                 if (row.insertId) {
                     return new SuccessModel()
-                } else {
-                    return new ErrorModel('新增博客失败')
                 }
+                return new ErrorModel('新增博客失败')
             })
         }
         // 更新博客
@@ -48,9 +47,8 @@ const handlerBlogRouter = (req, res) => {
             return result.then(row => {
                 if (row.affectedRows) {
                     return new SuccessModel()
-                } else {
-                    return new ErrorModel('更新博客失败')
                 }
+                return new ErrorModel('更新博客失败')
             })
         }
         // 删除博客
@@ -60,9 +58,8 @@ const handlerBlogRouter = (req, res) => {
             return result.then(row => {
                 if (row.affectedRows) {
                     return new SuccessModel()
-                } else {
-                    return new ErrorModel('删除博客失败')
                 }
+                return new ErrorModel('删除博客失败')
             })
         }
     }
