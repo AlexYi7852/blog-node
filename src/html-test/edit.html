@@ -80,7 +80,7 @@
         const url = '/api/blog/detail?id=' + urlParams.id
         get(url).then(res => {
             if (res.ERR_NO !== 0) {
-                alert('操作错误')
+                alert(res.message)
                 return
             }
 
@@ -105,7 +105,7 @@
             }
             post(url, data).then(res => {
                 if (res.ERR_NO !== 0) {
-                    alert('操作错误')
+                    alert(res.message)
                     return
                 }
                 alert('更新成功')
